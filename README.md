@@ -4,8 +4,8 @@ Script that pulls data from several sources and outputs a spreadsheet (this will
 
 As much as possible, the data should be pulled from HDX sources.
 
-*WB* WB indicators of interest: https://data.humdata.org/dataset/world-bank-indicators-of-interest-to-the-covid-19-outbreak
-*INFORM* Inform risk index: https://data.humdata.org/dataset/country-risk-profiles-for-191-countries
+* WB* WB indicators of interest: https://data.humdata.org/dataset/world-bank-indicators-of-interest-to-the-covid-19-outbreak
+* INFORM* Inform risk index: https://data.humdata.org/dataset/country-risk-profiles-for-191-countries
 
 Susceptibility to contagion:
 1. Age and Population - Population ages 65 and above (% total) *WB*

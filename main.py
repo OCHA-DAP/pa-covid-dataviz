@@ -31,9 +31,16 @@ setup_logging()
 logger = logging.getLogger()
 
 
-def create_dataframe():
-    df = make_initial_dataframe()
-    filenames = query_api()
+def create_dataframe(debug=True):
+    df_main = make_initial_dataframe()
+    if not debug:
+        filenames = query_api()
+    else:
+        filenames = {d: f'{d}.XLSX' for d in DATASETS}
+    for indicator, filename in filenames.items():
+        data_current = extract_data_from_excel(f'data/{filename}')
+        data_current['Indicator'] = indicator
+        df_main = df_main.append(data_current)
 
 
 def make_initial_dataframe():
@@ -48,13 +55,48 @@ def query_api():
     filenames = {}
     for resource in resources:
         if resource['name'] in DATASETS:
-            print(resource)
             _, path = resource.download()
             filename = os.path.basename(path)
             shutil.move(path, f'data/{filename}')
             filenames[resource['name']] = filename
             logging.info(f'Saved {resource["name"]} to data/{filename}')
     return filenames
+
+
+def extract_data_from_excel(excel_path):
+    output_columns = ['Country', 'ISO3', 'Value', 'Last Updated']
+    data = pd.read_excel(excel_path, sheet_name='Data', header=3)
+    data_current = pd.DataFrame(columns=output_columns)
+    for c in config.countries:
+        year = get_latest_year(data, c)
+        current_c = data[data['Country Name'] == c][['Country Name', 'Country Code', year]]
+        current_c['year'] = year
+        current_c.columns = output_columns
+        data_current = data_current.append(current_c)
+    global_vals = []
+    for c in data['Country Name'].unique():
+        year = get_latest_year(data, c)
+        val = data.loc[data['Country Name'] == c][year].values[0].astype(str)
+        if val != 'nan':
+            global_vals = global_vals+[data.loc[data['Country Name']==c][year].tolist()[0]]
+    global_baseline = sum(global_vals)/len(global_vals)
+    data_current = data_current.append(
+        pd.DataFrame({'Country': 'Global', 'ISO3': 'Global',
+                      'Value': global_baseline}, index=[0]))
+    return data_current
+
+
+def get_latest_year(df, country, start_year=2019, min_year=2009):
+    country_row = df.loc[df['Country Name'] == country]
+    y = start_year
+    while y > min_year:
+        try:
+            if country_row[str(y)].values[0].astype(str) != 'nan':
+                return str(y)
+        except IndexError:
+            pass
+        y -= 1
+    return str(min_year)
 
 
 if __name__ == "__main__":

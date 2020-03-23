@@ -1,7 +1,6 @@
 import shutil
 import os
 import logging
-import requests
 
 import pandas as pd
 from hdx.hdx_configuration import Configuration
@@ -18,14 +17,12 @@ WORLD_BANK_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outb
 WORLD_BANK_DATASET_NAMES = [
     'Age and Population - Population ages 65 and above (% of total)',
     'Water & Sanitation - People with basic handwashing facilities including soap and water (% of population)',
+    # Placeholder for HIV indicator name
     'Health - Hospital beds (per 1,000 people)',
     'Health - Physicians (per 1,000 people)',
     'Health - Nurses and midwives (per 1,000 people)',
     'Health - Out-of-pocket expenditure per capita, PPP (current international $)'
 ]
-
-HIV_DATA_URL = 'http://api.worldbank.org/v2/en/indicator/SH.DYN.A   IDS.ZS?downloadformat=excel'
-HIV_INDICATOR = 'Estimated number of people living with HIV - Adult (>15) rate'
 
 PEOPLE_IN_NEED_HDX_ADDRESS = 'global-humanitarian-overview-2020-figures'
 PEOPLE_IN_NEED_INDICATOR = 'Number of people in need'
@@ -37,13 +34,12 @@ logger = logging.getLogger()
 Configuration.create(hdx_site=HDX_SITE, hdx_read_only=True, user_agent=USER_AGENT)
 
 
-def create_dataframe(debug=True):
+def create_dataframe(debug=False):
     df_main = pd.DataFrame(columns=COLUMNS)
     if not debug:
         filenames = query_api_for_world_bank_data()
-        filenames[HIV_INDICATOR] = get_hiv_data()
     else:
-        filenames = {d: f'{d}.XLSX' for d in WORLD_BANK_DATASET_NAMES + [HIV_INDICATOR]}
+        filenames = {d: f'{d}.XLSX' for d in WORLD_BANK_DATASET_NAMES}
     for indicator, filename in filenames.items():
         data_current = extract_data_from_excel(f'data/{filename}')
         data_current['Indicator'] = indicator
@@ -54,7 +50,7 @@ def create_dataframe(debug=True):
     else:
         needs_filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
     df_main = df_main.append(get_number_of_people_in_need_per_country(needs_filename))
-    df_main.to_excel('main.xlsx', sheet_name='Indicator', index=False)
+    df_main.to_excel(config.output_filename, sheet_name='Indicator', index=False)
 
 
 def query_api_for_world_bank_data():
@@ -69,15 +65,6 @@ def query_api_for_world_bank_data():
             filenames[resource['name']] = filename
             logging.info(f'Saved {resource["name"]} to data/{filename}')
     return filenames
-
-
-def get_hiv_data():
-    # not on world bank HDX page
-    filename = f'{HIV_INDICATOR}.XLSX'
-    with open(f'data/{filename}', 'wb') as f:
-        response = requests.get(HIV_DATA_URL)
-        f.write(response.content)
-    return filename
 
 
 def extract_data_from_excel(excel_path):

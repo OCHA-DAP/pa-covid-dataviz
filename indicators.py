@@ -1,18 +1,8 @@
-import shutil
-import os
-import logging
-
 import pandas as pd
-from hdx.hdx_configuration import Configuration
-from hdx.data.dataset import Dataset
-from hdx.utilities.easy_logging import setup_logging
 
 import config
 import utils
 
-
-HDX_SITE = 'prod'
-USER_AGENT = 'Centre COVID-19 Dashboard'
 
 WORLD_BANK_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 WORLD_BANK_DATASET_NAMES = [
@@ -27,18 +17,15 @@ WORLD_BANK_DATASET_NAMES = [
 
 PEOPLE_IN_NEED_HDX_ADDRESS = 'global-humanitarian-overview-2020-figures'
 PEOPLE_IN_NEED_INDICATOR = 'Number of people in need'
+PEOPLE_IN_NEED_FILENAME = 'Humanitarian Needs and Funding 2011-2020.xlsx'  # for debug mode
 
 COLUMNS = ['Indicator', 'ISO3', 'Country', 'Value', 'Last Updated']
-
-setup_logging()
-logger = logging.getLogger()
-Configuration.create(hdx_site=HDX_SITE, hdx_read_only=True, user_agent=USER_AGENT)
 
 
 def create_dataframe(debug=False):
     df_main = pd.DataFrame(columns=COLUMNS)
     if not debug:
-        filenames = query_api_for_world_bank_data()
+        filenames = utils.query_api(WORLD_BANK_HDX_ADDRESS, dataset_names=WORLD_BANK_DATASET_NAMES)
     else:
         filenames = {d: f'{d}.XLSX' for d in WORLD_BANK_DATASET_NAMES}
     for indicator, filename in filenames.items():
@@ -46,26 +33,12 @@ def create_dataframe(debug=False):
         data_current['Indicator'] = indicator
         df_main = df_main.append(data_current)
     # Get people in need
-    if not debug:
-        needs_filename = query_api_for_people_in_need()
-    else:
-        needs_filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
+    #if not debug:
+    needs_filename = list(utils.query_api(PEOPLE_IN_NEED_HDX_ADDRESS).values())[0]
+    #else:
+    #   needs_filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
     df_main = df_main.append(get_number_of_people_in_need_per_country(needs_filename))
     return df_main
-
-
-def query_api_for_world_bank_data():
-    dataset = Dataset.read_from_hdx(WORLD_BANK_HDX_ADDRESS)
-    resources = dataset.get_resources()
-    filenames = {}
-    for resource in resources:
-        if resource['name'] in WORLD_BANK_DATASET_NAMES:
-            _, path = resource.download()
-            filename = os.path.basename(path)
-            shutil.move(path, f'data/{filename}')
-            filenames[resource['name']] = filename
-            logging.info(f'Saved {resource["name"]} to data/{filename}')
-    return filenames
 
 
 def extract_data_from_excel(excel_path):
@@ -91,18 +64,8 @@ def extract_data_from_excel(excel_path):
     return data_current
 
 
-def query_api_for_people_in_need():
-    dataset = Dataset.read_from_hdx(PEOPLE_IN_NEED_HDX_ADDRESS)
-    resource = dataset.get_resources()[0]
-    _, path = resource.download()
-    filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
-    shutil.move(path, f'data/{filename}')
-    logging.info(f'Saved {resource["name"]} to data/{filename}')
-    return filename
-
-
 def get_number_of_people_in_need_per_country(filename):
-    data = pd.read_excel(f'data/{filename}', sheet_name='Raw Data').sort_values(by='Year')
+    data = pd.read_excel(f'data/{filename}', sheet_name='Raw Data').sort_values (by='Year')
     output_columns = ['Country', 'ISO3', 'Value', 'Last Updated']
     data_current = pd.DataFrame(columns=output_columns)
     for c in config.countries:

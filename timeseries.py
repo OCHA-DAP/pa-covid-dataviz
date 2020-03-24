@@ -10,25 +10,27 @@ TIMESERIES_DATASET_NAMES = {
     'deaths': 'time_series-ncov-Deaths.csv',
     'recovered': 'time_series-ncov-Recovered.csv'}
 
+POP_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
+POP_DATASET_NAME = 'Total Population'
 
 COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quart ile']
-
-
-# import data
-pop = pd.read_csv("data/API_SP.POP.TOTL.FE.IN_DS2_en_csv_v2_878429.csv", skiprows=4)
-pop['Country Name'].loc[pop['Country Name']=='Syrian Arab Republic'] = 'Syria'
-pop['Country Name'].loc[pop['Country Name']=='Venezuela, RB'] = 'Venezuela'
 
 
 def create_dataframe(debug=False):
     # Download data and read in
     if not debug:
         filenames = utils.query_api(TIMESERIES_HDX_ADDRESS, dataset_names=list(TIMESERIES_DATASET_NAMES.values()))
+        filename_pop = list(utils.query_api(POP_HDX_ADDRESS, [POP_DATASET_NAME]).values())[0]
     else:
-        filenames = None
+        filenames = {filename: f'{filename}.CSV' for filename in TIMESERIES_DATASET_NAMES.values()}
+        filename_pop = f'{POP_DATASET_NAME}.XLSX'
+    # read it in
     confirmed = pd.read_csv(f'data/{filenames[TIMESERIES_DATASET_NAMES["confirmed"]]}')
     deaths = pd.read_csv(f'data/{filenames[TIMESERIES_DATASET_NAMES["deaths"]]}')
     recovered = pd.read_csv(f'data/{filenames[TIMESERIES_DATASET_NAMES["recovered"]]}')
+    pop = pd.read_excel(f'data/{filename_pop}', sheet_name='Data', header=3)
+    pop['Country Name'].loc[pop['Country Name'] == 'Syrian Arab Republic'] = 'Syria'
+    pop['Country Name'].loc[pop['Country Name'] == 'Venezuela, RB'] = 'Venezuela'
     # process and merge timeseries data
     timeseries = pd.DataFrame()
     timeseries = timeseries.append(create_timeseries(confirmed, 'confirmed'))

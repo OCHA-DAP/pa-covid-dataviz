@@ -8,6 +8,7 @@ from hdx.data.dataset import Dataset
 from hdx.utilities.easy_logging import setup_logging
 
 import config
+import utils
 
 
 HDX_SITE = 'prod'
@@ -17,7 +18,7 @@ WORLD_BANK_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outb
 WORLD_BANK_DATASET_NAMES = [
     'Age and Population - Population ages 65 and above (% of total)',
     'Water & Sanitation - People with basic handwashing facilities including soap and water (% of population)',
-    # Placeholder for HIV indicator name
+    'Health - Prevalence of HIV, total (% of population ages 15-49)',
     'Health - Hospital beds (per 1,000 people)',
     'Health - Physicians (per 1,000 people)',
     'Health - Nurses and midwives (per 1,000 people)',
@@ -50,7 +51,7 @@ def create_dataframe(debug=False):
     else:
         needs_filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
     df_main = df_main.append(get_number_of_people_in_need_per_country(needs_filename))
-    df_main.to_excel(config.output_filename, sheet_name='Indicator', index=False)
+    return df_main
 
 
 def query_api_for_world_bank_data():
@@ -72,14 +73,14 @@ def extract_data_from_excel(excel_path):
     data = pd.read_excel(excel_path, sheet_name='Data', header=3)
     data_current = pd.DataFrame(columns=output_columns)
     for c in config.countries:
-        year = get_latest_year(data, c)
+        year = utils.get_latest_year(data, c)
         current_c = data[data['Country Name'] == c][['Country Name', 'Country Code', year]]
         current_c['year'] = year
         current_c.columns = output_columns
         data_current = data_current.append(current_c)
     global_vals = []
     for c in data['Country Name'].unique():
-        year = get_latest_year(data, c)
+        year = utils.get_latest_year(data, c)
         val = data.loc[data['Country Name'] == c][year].values[0].astype(str)
         if val != 'nan':
             global_vals = global_vals+[data.loc[data['Country Name']==c][year].tolist()[0]]
@@ -88,19 +89,6 @@ def extract_data_from_excel(excel_path):
         pd.DataFrame({'Country': 'Global', 'ISO3': 'Global',
                       'Value': global_baseline}, index=[0]))
     return data_current
-
-
-def get_latest_year(df, country, start_year=2019, min_year=2009):
-    country_row = df.loc[df['Country Name'] == country]
-    y = start_year
-    while y > min_year:
-        try:
-            if country_row[str(y)].values[0].astype(str) != 'nan':
-                return str(y)
-        except IndexError:
-            pass
-        y -= 1
-    return str(min_year)
 
 
 def query_api_for_people_in_need():
@@ -125,7 +113,3 @@ def get_number_of_people_in_need_per_country(filename):
         data_current = data_current.append(current_c)
     data_current['Indicator'] = PEOPLE_IN_NEED_INDICATOR
     return data_current
-
-
-if __name__ == "__main__":
-    create_dataframe()

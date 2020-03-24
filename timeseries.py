@@ -9,6 +9,7 @@ import pandas as pd
 #from hdx.utilities.easy_logging import setup_logging
 
 import config # countries = config.countries
+import utils
 
 HDX_SITE = 'prod'
 USER_AGENT = 'Centre COVID-19 Dashboard'
@@ -25,9 +26,29 @@ COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quartile'
 confirmed = pd.read_csv("data/"+TIMESERIES_DATASET_NAMES[0]+".csv", skiprows=0)
 deaths = pd.read_csv("data/"+TIMESERIES_DATASET_NAMES[1]+".csv", skiprows=0)
 recovered = pd.read_csv("data/"+TIMESERIES_DATASET_NAMES[2]+".csv", skiprows=0)
-pop = pd.read_csv("data/API_SP.POP.TOTL_DS2_en_csv_v2_887275.csv", skiprows=4)
+pop = pd.read_csv("data/API_SP.POP.TOTL.FE.IN_DS2_en_csv_v2_878429.csv", skiprows=4)
 pop['Country Name'].loc[pop['Country Name']=='Syrian Arab Republic'] = 'Syria'
 pop['Country Name'].loc[pop['Country Name']=='Venezuela, RB'] = 'Venezuela'
+
+
+def create_dataframe():
+    # process and merge timeseries data
+    timeseries = pd.DataFrame()
+    timeseries = timeseries.append(create_timeseries(confirmed, 'confirmed'))
+    timeseries = timeseries.merge(create_timeseries(deaths, 'total deaths'), on=['Country', 'Date'], how='left')
+    timeseries = timeseries.merge(create_timeseries(recovered, 'recovered'), on=['Country', 'Date'], how='left')
+    pop_data = get_pop_data(pop)
+    timeseries = timeseries.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
+                                  right_on='Country Name', how='left')
+    timeseries = timeseries.drop('Country Name', axis=1)
+    timeseries['pop 100000'] = timeseries['latest population']/100000
+    timeseries['active cases'] = timeseries['confirmed'] - (timeseries['total deaths']+timeseries['recovered'])
+    timeseries['active cases per 100000'] = timeseries['active cases']/timeseries['pop 100000']
+    timeseries = get_ranks(timeseries)
+    print(timeseries.head())
+    timeseries.to_csv("OCHA_cases_timeseries.csv", index=False)
+    return timeseries
+
 
 def create_timeseries(indicator_df, col_name):
     # subset data
@@ -37,27 +58,16 @@ def create_timeseries(indicator_df, col_name):
     country_data.columns = ['Country', 'Date', col_name]
     return country_data
 
-def get_latest_year(df, country):
-    # get latest year available
-    country_row = df.loc[df['Country Name'] == country]
-    for y in ['2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010', '2009']:
-        try:
-            if country_row[y].values[0].astype(str)!='nan':
-                return y
-        except IndexError as e:
-            pass
-    return '2009'
 
 def get_pop_data(data):
     # apply latest year to population data
     data_current = pd.DataFrame()
     for c in config.countries:
-        year = get_latest_year(data, c)
+        year = utils.get_latest_year(data, c)
         current_c = data[data['Country Name']==c][['Country Name', 'Country Code', year]]
         current_c.columns = ['Country Name', 'Country Code', 'latest population']
         data_current = data_current.append(current_c)
     return data_current
-
 
 
 def get_quartile(rank):
@@ -70,6 +80,7 @@ def get_quartile(rank):
         return 3
     else:
         return 4
+
 
 def get_ranks(df):
     # get the ranks for each 7 day window
@@ -86,24 +97,3 @@ def get_ranks(df):
        ranked_df = ranked_df.append(date_sub)
    ranked_df['quartile'] = ranked_df['rank'].apply(lambda x: get_quartile(x))
    return ranked_df
-
-
-def main():
-    # process and merge timeseries data
-    timeseries = pd.DataFrame()
-    timeseries = timeseries.append(create_timeseries(confirmed, 'confirmed'))
-    timeseries = timeseries.merge(create_timeseries(deaths, 'total deaths'), on=['Country', 'Date'], how='left')
-    timeseries = timeseries.merge(create_timeseries(recovered, 'recovered'), on=['Country', 'Date'], how='left')
-    pop_data = get_pop_data(pop)
-    timeseries = timeseries.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country', right_on='Country Name', how='left')
-    timeseries = timeseries.drop('Country Name', axis=1)
-    timeseries['pop 100000'] = timeseries['latest population']/100000
-    timeseries['active cases'] = timeseries['confirmed'] - (timeseries['total deaths']+timeseries['recovered'])
-    timeseries['active cases per 100000'] = timeseries['active cases']/timeseries['pop 100000']
-    timeseries = get_ranks(timeseries)
-    print(timeseries.head())
-    timeseries.to_csv("OCHA_cases_timeseries.csv", index=False)
-    return timeseries
-
-if __name__ == "__main__":
-    main()

@@ -27,6 +27,3 @@ countries = ['Malawi',
              'Venezuela',
              'Eastern Europe',
              'Ukraine']
-
-
-output_filename = 'main.xlsx'

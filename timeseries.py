@@ -1,37 +1,34 @@
-import shutil
-import os
-import logging
-
 import pandas as pd
 
-#from hdx.hdx_configuration import Configuration
-#from hdx.data.dataset import Dataset
-#from hdx.utilities.easy_logging import setup_logging
-
-import config # countries = config.countries
+import config
 import utils
 
-HDX_SITE = 'prod'
-USER_AGENT = 'Centre COVID-19 Dashboard'
 
-TIMESERIES_ADDRESS = 'novel-coronavirus-2019-ncov-cases'
+TIMESERIES_HDX_ADDRESS = 'novel-coronavirus-2019-ncov-cases'
+TIMESERIES_DATASET_NAMES = {
+    'confirmed': 'time_series-ncov-Confirmed.csv',
+    'deaths': 'time_series-ncov-Deaths.csv',
+    'recovered': 'time_series-ncov-Recovered.csv'}
 
-TIMESERIES_DATASET_NAMES = ['time_series-ncov-Confirmed', 'time_series-ncov-Deaths',
-'time_series-ncov-Recovered' ]
 
-COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quartile']
+COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quart ile']
 
 
 # import data
-confirmed = pd.read_csv("data/"+TIMESERIES_DATASET_NAMES[0]+".csv", skiprows=0)
-deaths = pd.read_csv("data/"+TIMESERIES_DATASET_NAMES[1]+".csv", skiprows=0)
-recovered = pd.read_csv("data/"+TIMESERIES_DATASET_NAMES[2]+".csv", skiprows=0)
 pop = pd.read_csv("data/API_SP.POP.TOTL.FE.IN_DS2_en_csv_v2_878429.csv", skiprows=4)
 pop['Country Name'].loc[pop['Country Name']=='Syrian Arab Republic'] = 'Syria'
 pop['Country Name'].loc[pop['Country Name']=='Venezuela, RB'] = 'Venezuela'
 
 
-def create_dataframe():
+def create_dataframe(debug=False):
+    # Download data and read in
+    if not debug:
+        filenames = utils.query_api(TIMESERIES_HDX_ADDRESS, dataset_names=list(TIMESERIES_DATASET_NAMES.values()))
+    else:
+        filenames = None
+    confirmed = pd.read_csv(f'data/{filenames[TIMESERIES_DATASET_NAMES["confirmed"]]}')
+    deaths = pd.read_csv(f'data/{filenames[TIMESERIES_DATASET_NAMES["deaths"]]}')
+    recovered = pd.read_csv(f'data/{filenames[TIMESERIES_DATASET_NAMES["recovered"]]}')
     # process and merge timeseries data
     timeseries = pd.DataFrame()
     timeseries = timeseries.append(create_timeseries(confirmed, 'confirmed'))

@@ -16,11 +16,11 @@ def parse_args():
 
 
 def main(debug):
-    df_indicators = indicators.create_dataframe(debug)
-    df_timeseries = timeseries.create_dataframe()
+    #df_indicators = indicators.create_dataframe(debug)
+    df_timeseries = timeseries.create_dataframe(debug)
     # Write to excel file
     writer = pd.ExcelWriter(OUTPUT_FILENAME, engine='xlsxwriter')
-    df_indicators.to_excel(writer, sheet_name='Indicator', index=False)
+    #df_indicators.to_excel(writer, sheet_name='Indicator', index=False)
     df_timeseries.to_excel(writer, sheet_name='Timeseries', index=False)
     writer.save()
 

@@ -19,7 +19,7 @@ PEOPLE_IN_NEED_HDX_ADDRESS = 'global-humanitarian-overview-2020-figures'
 PEOPLE_IN_NEED_INDICATOR = 'Number of people in need'
 PEOPLE_IN_NEED_FILENAME = 'Humanitarian Needs and Funding 2011-2020.xlsx'  # for debug mode
 
-COLUMNS = ['Indicator', 'ISO3', 'Country', 'Value', 'Last Updated']
+COLUMNS = ['Indicator', 'ISO3', 'Country', 'Value', 'Last Up dated']
 
 
 def create_dataframe(debug=False):
@@ -32,7 +32,7 @@ def create_dataframe(debug=False):
         data_current = extract_data_from_excel(f'data/{filename}')
         data_current['Indicator'] = indicator
         df_main = df_main.append(data_current)
-    # Get people in need
+    # Get people in neeonfirmed.csvd
     #if not debug:
     needs_filename = list(utils.query_api(PEOPLE_IN_NEED_HDX_ADDRESS).values())[0]
     #else:

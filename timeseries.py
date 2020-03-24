@@ -34,7 +34,7 @@ def create_dataframe(debug=False):
     # process and merge timeseries data
     timeseries = pd.DataFrame()
     timeseries = timeseries.append(create_timeseries(case_data, 'confirmed cases'))
-    pop_data = get_pop_data(pop)
+    pop_data = utils.get_pop_data(pop)
     timeseries = timeseries.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
                                   right_on='Country Name', how='left')
     timeseries = timeseries.drop('Country Name', axis=1)
@@ -57,17 +57,6 @@ def create_timeseries(indicator_df, col_name):
         lambda x: [el.capitalize() if el not in ['of', 'the'] else el for el in x]).str.join(' ')
 
     return country_data
-
-
-def get_pop_data(data):
-    # apply latest year to population data
-    data_current = pd.DataFrame()
-    for c in config.countries:
-        year = utils.get_latest_year(data, c)
-        current_c = data[data['Country Name'] == c][['Country Name', 'Country Code', year]]
-        current_c.columns = ['Country Name', 'Country Code', 'latest population']
-        data_current = data_current.append(current_c)
-    return data_current
 
 
 def get_quartile(rank):

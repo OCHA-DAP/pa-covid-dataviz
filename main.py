@@ -4,6 +4,7 @@ import pandas as pd
 
 import indicators
 import timeseries
+import cumulative
 
 OUTPUT_FILENAME = 'main.xlsx'
 
@@ -18,10 +19,12 @@ def parse_args():
 def main(debug):
     df_indicators = indicators.create_dataframe(debug)
     df_timeseries = timeseries.create_dataframe(debug)
+    df_cumulative = cumulative.create_dataframe(debug)
     # Write to excel file
     writer = pd.ExcelWriter(OUTPUT_FILENAME, engine='xlsxwriter')
     df_indicators.to_excel(writer, sheet_name='Indicator', index=False)
     df_timeseries.to_excel(writer, sheet_name='Timeseries', index=False)
+    df_cumulative.to_excel(writer, sheet_name='Cumulative', index=False)
     writer.save()
 
 

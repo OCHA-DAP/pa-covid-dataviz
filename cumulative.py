@@ -45,4 +45,12 @@ def create_dataframe(debug=False):
     cumulative['pop 100000'] = cumulative['latest population']/100000
     cumulative['confirmed cases per 100000'] = cumulative['confirmed cases']/cumulative['pop 100000']
     cumulative['deaths per 100000'] = cumulative['deaths']/cumulative['pop 100000']
+    # Get global cases
+    global_cases_and_deaths = case_data[['cum_conf', 'cum_death']].sum()
+    n_countries = len(case_data['ADM0_NAME'].unique())
+    cumulative = cumulative.append({'Country': 'Global',
+                                    'confirmed cases': global_cases_and_deaths['cum_conf'],
+                                    'deaths': global_cases_and_deaths['cum_death']}, ignore_index=True)
+    cumulative['n_countries'] = 1
+    cumulative.loc[cumulative['Country'] == 'Global', 'n_countries'] = n_countries
     return cumulative

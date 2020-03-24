@@ -2,9 +2,12 @@ import logging
 import shutil
 import os
 
+import pandas as pd
 from hdx.hdx_configuration import Configuration
 from hdx.data.dataset import Dataset
 from hdx.utilities.easy_logging import setup_logging
+
+import config
 
 
 HDX_SITE = 'prod'
@@ -43,3 +46,14 @@ def get_latest_year(df, country, start_year=2019, min_year=2009):
             pass
         y -= 1
     return str(min_year)
+
+
+def get_pop_data(data):
+    # apply latest year to population data
+    data_current = pd.DataFrame()
+    for c in config.countries:
+        year = get_latest_year(data, c)
+        current_c = data[data['Country Name'] == c][['Country Name', 'Country Code', year]]
+        current_c.columns = ['Country Name', 'Country Code', 'latest population']
+        data_current = data_current.append(current_c)
+    return data_current

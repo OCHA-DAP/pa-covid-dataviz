@@ -19,7 +19,7 @@ countries = [
     'South Sudan',
     'Sudan',
     'Syria',
-    'Ukraine'
+    'Ukraine',
     'Venezuela',
     'Yemen',
 ]

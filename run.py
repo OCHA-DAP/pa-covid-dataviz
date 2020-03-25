@@ -12,9 +12,7 @@ from hdx.location.country import Country
 from hdx.utilities.easy_logging import setup_logging
 from hdx.utilities.path import script_dir_plus_file
 
-import indicators
-import timeseries
-import cumulative
+from main import get_indicators
 
 setup_logging()
 
@@ -37,9 +35,7 @@ def main(gsheet_auth, debug, **ignore):
     configuration = Configuration.read()
     countries = configuration['countries']
     palestine_country_code, _ = Country.get_iso3_country_code_fuzzy('Palestine')
-    df_indicators = indicators.create_dataframe(countries, debug)
-    df_timeseries = timeseries.create_dataframe(countries, palestine_country_code, debug)
-    df_cumulative = cumulative.create_dataframe(countries, palestine_country_code, debug)
+    df_indicators, df_timeseries, df_cumulative = get_indicators(countries, palestine_country_code, debug)
     # Write to excel file
     writer = pd.ExcelWriter(OUTPUT_FILENAME, engine='xlsxwriter')
     df_indicators.to_excel(writer, sheet_name='Indicator', index=False)
@@ -77,7 +73,6 @@ if __name__ == '__main__':
     preprefix = args.preprefix
     if preprefix is None:
         preprefix = getenv('PREPREFIX')
-    preprefix = args.preprefix
     hdx_site = args.hdx_site
     if hdx_site is None:
         hdx_site = getenv('HDX_SITE', 'prod')

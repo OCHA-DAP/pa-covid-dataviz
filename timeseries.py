@@ -38,7 +38,8 @@ def create_dataframe(debug=False):
     timeseries = timeseries.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
                                   right_on='Country Name', how='left')
     timeseries = timeseries.drop('Country Name', axis=1)
-    timeseries['Country Code'].loc[timeseries['Country']=='Occupied Palestinian Territory'] = 'PSE'
+    timeseries['Country Code'].loc[timeseries['Country']
+                                   == 'Occupied Palestinian Territory'] = config.palestine_country_code
     timeseries['pop 100000'] = timeseries['latest population']/100000
     timeseries['confirmed cases per 100000'] = timeseries['confirmed cases']/timeseries['pop 100000']
     timeseries = get_ranks(timeseries)

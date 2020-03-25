@@ -34,13 +34,16 @@ def create_dataframe(debug=False):
                                                        'Congo, Dem. Rep.': 'Democratic Republic of the Congo'
                                                        })
     # Get cumulative data
-    cumulative = case_data.loc[case_data['ADM0_NAME'].isin(config.countries), ['ADM0_NAME', 'cum_conf', 'cum_death']]
-    cumulative.columns = ['Country', 'confirmed cases', 'deaths']
+    cumulative = case_data.loc[case_data['ADM0_NAME'].isin(config.countries),
+                               ['ADM0_NAME', 'cum_conf', 'cum_death', 'DateOfReport']]
+    cumulative.columns = ['Country', 'confirmed cases', 'deaths', 'last_updated']
     # Combine with pop
     pop_data = utils.get_pop_data(pop)
     cumulative = cumulative.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
                                   right_on='Country Name', how='left')
     cumulative = cumulative.drop('Country Name', axis=1)
+    cumulative['Country Code'].loc[cumulative['Country']
+                                   == 'Occupied Palestinian Territory'] = config.palestine_country_code
     # Get per 100000
     cumulative['pop 100000'] = cumulative['latest population']/100000
     cumulative['confirmed cases per 100000'] = cumulative['confirmed cases']/cumulative['pop 100000']

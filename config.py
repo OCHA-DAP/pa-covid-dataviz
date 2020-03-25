@@ -23,3 +23,5 @@ countries = [
     'Venezuela',
     'Yemen',
 ]
+
+palestine_country_code = 'PSE'

@@ -19,7 +19,7 @@ PEOPLE_IN_NEED_HDX_ADDRESS = 'global-humanitarian-overview-2020-figures'
 PEOPLE_IN_NEED_INDICATOR = 'Number of people in need'
 PEOPLE_IN_NEED_FILENAME = 'Humanitarian Needs and Funding 2011-2020.xlsx'  # for debug mode
 
-COLUMNS = ['Indicator', 'ISO3', 'Country', 'Value', 'Last Up dated']
+COLUMNS = ['Indicator', 'ISO3', 'Country', 'Value', 'Last Updated']
 
 
 def create_dataframe(debug=False):

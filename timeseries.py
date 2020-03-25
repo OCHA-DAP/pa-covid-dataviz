@@ -69,13 +69,16 @@ def get_quartile(rank):
         return 2
     elif rank >= 0.25:
         return 3
-    else:
+    elif rank >= 0:
         return 4
+    else:
+        return None
 
 
 def get_ranks(df):
     # get the ranks for each 7 day window
     new_df = pd.DataFrame()
+    df = df.sort_values(by='Date', ascending=False)
     for country in df['Country'].unique():
         sub = df.loc[df['Country'] == country]
         sub['prev confirmed cases'] = sub['confirmed cases per 100000'].shift(-7, axis=0)

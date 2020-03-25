@@ -1,6 +1,5 @@
 import pandas as pd
 
-import config
 import utils
 
 
@@ -13,7 +12,7 @@ POP_DATASET_NAME = 'Total Population'
 COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quart ile']
 
 
-def create_dataframe(debug=False):
+def create_dataframe(countries, palestine_country_code, debug=False):
     # Download data and read in
     if not debug:
         filename = list(utils.query_api(TIMESERIES_HDX_ADDRESS, [TIMESERIES_DATASET_NAME]).values())[0]
@@ -33,13 +32,13 @@ def create_dataframe(debug=False):
                                                        })
     # process and merge timeseries data
     timeseries = pd.DataFrame()
-    timeseries = timeseries.append(create_timeseries(case_data, 'confirmed cases'))
-    pop_data = utils.get_pop_data(pop)
+    timeseries = timeseries.append(create_timeseries(countries, case_data, 'confirmed cases'))
+    pop_data = utils.get_pop_data(countries, pop)
     timeseries = timeseries.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
                                   right_on='Country Name', how='left')
     timeseries = timeseries.drop('Country Name', axis=1)
     timeseries['Country Code'].loc[timeseries['Country']
-                                   == 'Occupied Palestinian Territory'] = config.palestine_country_code
+                                   == 'Occupied Palestinian Territory'] = palestine_country_code
     timeseries['pop 100000'] = timeseries['latest population']/100000
     timeseries['confirmed cases per 100000'] = timeseries['confirmed cases']/timeseries['pop 100000']
     timeseries = get_ranks(timeseries)
@@ -48,10 +47,10 @@ def create_dataframe(debug=False):
     return timeseries
 
 
-def create_timeseries(indicator_df, col_name):
+def create_timeseries(countries, indicator_df, col_name):
     # subset data
     country_data = indicator_df.loc[indicator_df['ADM0_NAME'].str.lower()
-                                    .isin(country_name.lower() for country_name in config.countries)]
+                                    .isin(country_name.lower() for country_name in countries)]
     country_data = country_data[['ADM0_NAME', 'DateOfDataEntry', 'cum_conf']]
     country_data['cum_conf'] = country_data['cum_conf'].astype(int)
     country_data.columns = ['Country', 'Date', col_name]

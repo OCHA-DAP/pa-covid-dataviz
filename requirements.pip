@@ -4,4 +4,4 @@ matplotlib==3.2.1
 seaborn==0.10.0
 hdx-python-api==4.3.5
 xlsxwriter==1.2.8
-
+pygsheets==2.0.3.1

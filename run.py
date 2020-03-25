@@ -1,5 +1,9 @@
 import argparse
+import json
 from os import getenv
+
+import pygsheets
+from google.oauth2 import service_account
 
 import pandas as pd
 from hdx.facades.keyword_arguments import facade
@@ -20,19 +24,11 @@ OUTPUT_FILENAME = 'main.xlsx'
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--debug", "-d", action="store_true", help="Run without querying API")
-    parser.add_argument('-hk', '--hdx_key', default=None, help='HDX api key')
     parser.add_argument('-ua', '--user_agent', default=None, help='user agent')
     parser.add_argument('-pp', '--preprefix', default=None, help='preprefix')
     parser.add_argument('-hs', '--hdx_site', default=None, help='HDX site to use')
-    parser.add_argument('-db', '--db_url', default=None, help='Database connection string')
-    parser.add_argument('-dp', '--db_params', default=None, help='Database connection parameters. Overrides --db_url.')
-    parser.add_argument('-es', '--email_server', default=None, help='Email server to use')
     parser.add_argument('-gs', '--gsheet_auth', default=None, help='Credentials for accessing Google Sheets')
-    parser.add_argument('-et', '--email_test', default=False, action='store_true',
-                        help='Email only test users for testing purposes')
-    parser.add_argument('-st', '--spreadsheet_test', default=False, action='store_true',
-                        help='Use test instead of prod spreadsheet')
+    parser.add_argument('-d', '--debug', action='store_true', help='Run without querying API')
     args = parser.parse_args()
     return args
 
@@ -40,7 +36,7 @@ def parse_args():
 def main(gsheet_auth, debug, **ignore):
     configuration = Configuration.read()
     countries = configuration['countries']
-    palestine_country_code = Country.get_iso3_country_code('Palestine')
+    palestine_country_code, _ = Country.get_iso3_country_code_fuzzy('Palestine')
     df_indicators = indicators.create_dataframe(countries, debug)
     df_timeseries = timeseries.create_dataframe(countries, palestine_country_code, debug)
     df_cumulative = cumulative.create_dataframe(countries, palestine_country_code, debug)
@@ -50,6 +46,24 @@ def main(gsheet_auth, debug, **ignore):
     df_timeseries.to_excel(writer, sheet_name='Timeseries', index=False)
     df_cumulative.to_excel(writer, sheet_name='Cumulative', index=False)
     writer.save()
+    # Write to gsheets
+    info = json.loads(gsheet_auth)
+    scopes = ['https://www.googleapis.com/auth/spreadsheets']
+    credentials = service_account.Credentials.from_service_account_info(info, scopes=scopes)
+    gc = pygsheets.authorize(custom_credentials=credentials)
+    spreadsheet = gc.open_by_url(configuration['spreadsheet_url'])
+    sheet = spreadsheet.worksheet_by_title(configuration['indicator_sheetname'])
+    sheet.clear()
+    dfout = df_indicators.fillna('')
+    sheet.set_dataframe(dfout, (1, 1))
+    sheet = spreadsheet.worksheet_by_title(configuration['timeseries_sheetname'])
+    sheet.clear()
+    dfout = df_timeseries.fillna('')
+    sheet.set_dataframe(dfout, (1, 1))
+    sheet = spreadsheet.worksheet_by_title(configuration['cumulative_sheetname'])
+    sheet.clear()
+    dfout = df_cumulative.fillna('')
+    sheet.set_dataframe(dfout, (1, 1))
 
 
 if __name__ == '__main__':

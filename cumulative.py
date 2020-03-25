@@ -1,6 +1,5 @@
 import pandas as pd
 
-import config
 import utils
 
 
@@ -13,7 +12,7 @@ POP_DATASET_NAME = 'Total Population'
 COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quart ile']
 
 
-def create_dataframe(debug=False):
+def create_dataframe(countries, palestine_country_code, debug=False):
     # Download data and read in
     if not debug:
         filename = list(utils.query_api(CUMULATIVE_HDX_ADDRESS, [CUMULATIVE_DATASET_NAME]).values())[0]
@@ -34,16 +33,16 @@ def create_dataframe(debug=False):
                                                        'Congo, Dem. Rep.': 'Democratic Republic of the Congo'
                                                        })
     # Get cumulative data
-    cumulative = case_data.loc[case_data['ADM0_NAME'].isin(config.countries),
+    cumulative = case_data.loc[case_data['ADM0_NAME'].isin(countries),
                                ['ADM0_NAME', 'cum_conf', 'cum_death', 'DateOfReport']]
     cumulative.columns = ['Country', 'confirmed cases', 'deaths', 'last_updated']
     # Combine with pop
-    pop_data = utils.get_pop_data(pop)
+    pop_data = utils.get_pop_data(countries, pop)
     cumulative = cumulative.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
                                   right_on='Country Name', how='left')
     cumulative = cumulative.drop('Country Name', axis=1)
     cumulative['Country Code'].loc[cumulative['Country']
-                                   == 'Occupied Palestinian Territory'] = config.palestine_country_code
+                                   == 'Occupied Palestinian Territory'] = palestine_country_code
     # Get per 100000
     cumulative['pop 100000'] = cumulative['latest population']/100000
     cumulative['confirmed cases per 100000'] = cumulative['confirmed cases']/cumulative['pop 100000']

@@ -1,6 +1,5 @@
 import pandas as pd
 
-import config
 import utils
 
 
@@ -22,14 +21,14 @@ PEOPLE_IN_NEED_FILENAME = 'Humanitarian Needs and Funding 2011-2020.xlsx'  # for
 COLUMNS = ['Indicator', 'ISO3', 'Country', 'Value', 'Last Up dated']
 
 
-def create_dataframe(debug=False):
+def create_dataframe(countries, debug=False):
     df_main = pd.DataFrame(columns=COLUMNS)
     if not debug:
         filenames = utils.query_api(WORLD_BANK_HDX_ADDRESS, dataset_names=WORLD_BANK_DATASET_NAMES)
     else:
         filenames = {d: f'{d}.XLSX' for d in WORLD_BANK_DATASET_NAMES}
     for indicator, filename in filenames.items():
-        data_current = extract_data_from_excel(f'data/{filename}')
+        data_current = extract_data_from_excel(countries, f'data/{filename}')
         data_current['Indicator'] = indicator
         df_main = df_main.append(data_current)
     # Get people in neeonfirmed.csvd
@@ -37,15 +36,15 @@ def create_dataframe(debug=False):
     needs_filename = list(utils.query_api(PEOPLE_IN_NEED_HDX_ADDRESS).values())[0]
     #else:
     #   needs_filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
-    df_main = df_main.append(get_number_of_people_in_need_per_country(needs_filename))
+    df_main = df_main.append(get_number_of_people_in_need_per_country(countries, needs_filename))
     return df_main
 
 
-def extract_data_from_excel(excel_path):
+def extract_data_from_excel(countries, excel_path):
     output_columns = ['Country', 'ISO3', 'Value', 'Last Updated']
     data = pd.read_excel(excel_path, sheet_name='Data', header=3)
     data_current = pd.DataFrame(columns=output_columns)
-    for c in config.countries:
+    for c in countries:
         year = utils.get_latest_year(data, c)
         current_c = data[data['Country Name'] == c][['Country Name', 'Country Code', year]]
         current_c['year'] = year
@@ -64,11 +63,11 @@ def extract_data_from_excel(excel_path):
     return data_current
 
 
-def get_number_of_people_in_need_per_country(filename):
+def get_number_of_people_in_need_per_country(countries, filename):
     data = pd.read_excel(f'data/{filename}', sheet_name='Raw Data').sort_values (by='Year')
     output_columns = ['Country', 'ISO3', 'Value', 'Last Updated']
     data_current = pd.DataFrame(columns=output_columns)
-    for c in config.countries:
+    for c in countries:
         current_c = data[(data['Crisis Country'] == c) &
                          (data['Metric'] == 'People in need')][
             ['Crisis Country', 'Country Code', 'Value', 'Year']].tail(1)

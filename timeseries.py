@@ -38,6 +38,7 @@ def create_dataframe(debug=False):
     timeseries = timeseries.merge(pop_data[['Country Name', 'Country Code', 'latest population']], left_on='Country',
                                   right_on='Country Name', how='left')
     timeseries = timeseries.drop('Country Name', axis=1)
+    timeseries['Country Code'].loc[timeseries['Country']=='Occupied Palestinian Territory'] = 'PSE'
     timeseries['pop 100000'] = timeseries['latest population']/100000
     timeseries['confirmed cases per 100000'] = timeseries['confirmed cases']/timeseries['pop 100000']
     timeseries = get_ranks(timeseries)
@@ -50,8 +51,8 @@ def create_timeseries(indicator_df, col_name):
     # subset data
     country_data = indicator_df.loc[indicator_df['ADM0_NAME'].str.lower()
                                     .isin(country_name.lower() for country_name in config.countries)]
-    country_data = country_data[['ADM0_NAME', 'DateOfDataEntry', 'NewCase']]
-    country_data['NewCase'] = country_data['NewCase'].astype(int)
+    country_data = country_data[['ADM0_NAME', 'DateOfDataEntry', 'cum_conf']]
+    country_data['cum_conf'] = country_data['cum_conf'].astype(int)
     country_data.columns = ['Country', 'Date', col_name]
     country_data['Country'] = country_data['Country'].str.split().apply(
         lambda x: [el.capitalize() if el not in ['of', 'the'] else el for el in x]).str.join(' ')

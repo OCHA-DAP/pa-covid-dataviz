@@ -47,23 +47,24 @@ def main(gsheet_auth, debug, **ignore):
     df_cumulative.to_excel(writer, sheet_name='Cumulative', index=False)
     writer.save()
     # Write to gsheets
-    info = json.loads(gsheet_auth)
-    scopes = ['https://www.googleapis.com/auth/spreadsheets']
-    credentials = service_account.Credentials.from_service_account_info(info, scopes=scopes)
-    gc = pygsheets.authorize(custom_credentials=credentials)
-    spreadsheet = gc.open_by_url(configuration['spreadsheet_url'])
-    sheet = spreadsheet.worksheet_by_title(configuration['indicator_sheetname'])
-    sheet.clear()
-    dfout = df_indicators.fillna('')
-    sheet.set_dataframe(dfout, (1, 1))
-    sheet = spreadsheet.worksheet_by_title(configuration['timeseries_sheetname'])
-    sheet.clear()
-    dfout = df_timeseries.fillna('')
-    sheet.set_dataframe(dfout, (1, 1))
-    sheet = spreadsheet.worksheet_by_title(configuration['cumulative_sheetname'])
-    sheet.clear()
-    dfout = df_cumulative.fillna('')
-    sheet.set_dataframe(dfout, (1, 1))
+    if gsheet_auth is not None:
+        info = json.loads(gsheet_auth)
+        scopes = ['https://www.googleapis.com/auth/spreadsheets']
+        credentials = service_account.Credentials.from_service_account_info(info, scopes=scopes)
+        gc = pygsheets.authorize(custom_credentials=credentials)
+        spreadsheet = gc.open_by_url(configuration['spreadsheet_url'])
+        sheet = spreadsheet.worksheet_by_title(configuration['indicator_sheetname'])
+        sheet.clear()
+        dfout = df_indicators.fillna('')
+        sheet.set_dataframe(dfout, (1, 1))
+        sheet = spreadsheet.worksheet_by_title(configuration['timeseries_sheetname'])
+        sheet.clear()
+        dfout = df_timeseries.fillna('')
+        sheet.set_dataframe(dfout, (1, 1))
+        sheet = spreadsheet.worksheet_by_title(configuration['cumulative_sheetname'])
+        sheet.clear()
+        dfout = df_cumulative.fillna('')
+        sheet.set_dataframe(dfout, (1, 1))
 
 
 if __name__ == '__main__':

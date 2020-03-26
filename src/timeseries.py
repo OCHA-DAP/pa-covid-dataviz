@@ -2,7 +2,6 @@ import pandas as pd
 
 import utils
 
-
 TIMESERIES_HDX_ADDRESS = 'coronavirus-covid-19-cases-data-for-china-and-the-rest-of-the-world'
 TIMESERIES_DATASET_NAME = 'covid-19 historical cases by country.csv'
 

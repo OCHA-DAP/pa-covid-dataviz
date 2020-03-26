@@ -1,6 +1,4 @@
-import cumulative
-import indicators
-import timeseries
+import timeseries, cumulative, indicators
 
 
 def get_indicators(countries, palestine_country_code, debug):

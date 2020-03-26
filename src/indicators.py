@@ -2,7 +2,6 @@ import pandas as pd
 
 import utils
 
-
 WORLD_BANK_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 WORLD_BANK_DATASET_NAMES = [
     'Age and Population - Population ages 65 and above (% of total)',

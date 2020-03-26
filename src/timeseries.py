@@ -44,7 +44,6 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
     timeseries['confirmed cases per 100000'] = timeseries['confirmed cases']/timeseries['pop 100000']
     timeseries = get_ranks(timeseries)
     print(timeseries.head())
-    timeseries.to_csv("OCHA_cases_timeseries.csv", index=False)
     return timeseries
 
 

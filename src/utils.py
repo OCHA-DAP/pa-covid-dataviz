@@ -1,6 +1,7 @@
 import logging
 import shutil
 import os
+from os.path import join
 
 import pandas as pd
 from hdx.data.dataset import Dataset
@@ -8,7 +9,7 @@ from hdx.data.dataset import Dataset
 logger = logging.getLogger()
 
 
-def query_api(hdx_address, dataset_names=None):
+def query_api(folder, hdx_address, dataset_names=None):
     if dataset_names is None:
         dataset_names = []
     dataset = Dataset.read_from_hdx(hdx_address)
@@ -18,9 +19,9 @@ def query_api(hdx_address, dataset_names=None):
         if resource['name'] in dataset_names or not dataset_names:
             _, path = resource.download()
             filename = os.path.basename(path)
-            shutil.move(path, f'data/{filename}')
+            shutil.move(path, join(folder, filename))
             filenames[resource['name']] = filename
-            logging.info(f'Saved {resource["name"]} to data/{filename}')
+            logging.info(f'Saved {resource["name"]} to {folder}/{filename}')
     return filenames
 
 

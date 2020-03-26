@@ -1,7 +1,8 @@
+from os.path import join
+
 import pandas as pd
 
 import utils
-
 
 TIMESERIES_HDX_ADDRESS = 'coronavirus-covid-19-cases-data-for-china-and-the-rest-of-the-world'
 TIMESERIES_DATASET_NAME = 'covid-19 historical cases by country.csv'
@@ -12,19 +13,19 @@ POP_DATASET_NAME = 'Total Population'
 COLUMNS = ['Date', 'ISO3', 'Country', 'Active Cases', 'Total Deaths', 'Quart ile']
 
 
-def create_dataframe(countries, palestine_country_code, debug=False):
+def create_dataframe(folder, countries, palestine_country_code, debug=False):
     # Download data and read in
     if not debug:
-        filename = list(utils.query_api(TIMESERIES_HDX_ADDRESS, [TIMESERIES_DATASET_NAME]).values())[0]
-        filename_pop = list(utils.query_api(POP_HDX_ADDRESS, [POP_DATASET_NAME]).values())[0]
+        filename = list(utils.query_api(folder, TIMESERIES_HDX_ADDRESS, [TIMESERIES_DATASET_NAME]).values())[0]
+        filename_pop = list(utils.query_api(folder, POP_HDX_ADDRESS, [POP_DATASET_NAME]).values())[0]
     else:
         filename = f'{TIMESERIES_DATASET_NAME}.CSV'
         filename_pop = f'{POP_DATASET_NAME}.XLSX'
     # read them in
-    case_data = pd.read_csv(f'data/{filename}')
+    case_data = pd.read_csv(join(folder, filename))
     case_data['ADM0_NAME'] = case_data['ADM0_NAME'].str.lower().replace(
         {'venezuela (bolivarian republic of)': 'Venezuela'})
-    pop = pd.read_excel(f'data/{filename_pop}', sheet_name='Data', header=3)
+    pop = pd.read_excel(join(folder, filename_pop), sheet_name='Data', header=3)
     pop['Country Name'] = pop['Country Name'].replace({
                                                        'Syrian Arab Republic': 'Syria',
                                                        'Venezuela, RB': 'Venezuela',
@@ -43,7 +44,6 @@ def create_dataframe(countries, palestine_country_code, debug=False):
     timeseries['confirmed cases per 100000'] = timeseries['confirmed cases']/timeseries['pop 100000']
     timeseries = get_ranks(timeseries)
     print(timeseries.head())
-    timeseries.to_csv("OCHA_cases_timeseries.csv", index=False)
     return timeseries
 
 

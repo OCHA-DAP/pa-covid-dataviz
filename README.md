@@ -1,6 +1,7 @@
 # pa-covid-dataviz
 
-Script that pulls data from several sources and outputs a spreadsheet (this will go into a Google spreadsheet). The script will be run every night (around 4 AM CET?) by a cron job.
+Script that pulls data from several sources and outputs a spreadsheet (this will go into a Google spreadsheet). The script
+will be run every night (around 4 AM CET?) in Jenkins. It creates less than 15 temporary files and runs for 5 minutes.
 
 As much as possible, the data should be pulled from HDX sources.
 

@@ -9,7 +9,7 @@ from hdx.data.dataset import Dataset
 logger = logging.getLogger()
 
 
-def query_api(hdx_address, dataset_names=None, folder='data'):
+def query_api(folder, hdx_address, dataset_names=None):
     if dataset_names is None:
         dataset_names = []
     dataset = Dataset.read_from_hdx(hdx_address)

@@ -1,0 +1,4 @@
+,Country,confirmed cases,deaths,last_updated,Country Code,latest population,pop 100000,confirmed cases per 100000,deaths per 100000,n_countries
+0,Afghanistan,74,1,2020-03-24T00:00:00.000Z,AFG,37172386.0,371.72386,0.19907250505792123,0.002690168987269206,1
+1,Occupied Palestinian Territory,62,0,2020-03-24T00:00:00.000Z,PSE,,,,,1
+2,Global,416686,18589,,,,,,,197

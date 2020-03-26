@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from os import getenv
 from os.path import join
 from shutil import rmtree
@@ -12,8 +13,9 @@ from hdx.facades.keyword_arguments import facade
 from hdx.hdx_configuration import Configuration
 from hdx.location.country import Country
 from hdx.utilities.easy_logging import setup_logging
-from hdx.utilities.path import script_dir_plus_file, temp_dir, get_temp_dir
+from hdx.utilities.path import get_temp_dir
 
+sys.path.append('src')
 from main import get_indicators
 
 setup_logging()

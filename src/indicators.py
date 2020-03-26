@@ -33,10 +33,10 @@ def create_dataframe(folder, countries, debug=False):
         data_current['Indicator'] = indicator
         df_main = df_main.append(data_current)
     # Get people in neeonfirmed.csvd
-    #if not debug:
-    needs_filename = list(utils.query_api(folder, PEOPLE_IN_NEED_HDX_ADDRESS).values())[0]
-    #else:
-    #   needs_filename = f'{PEOPLE_IN_NEED_INDICATOR}.XLSX'
+    if not debug:
+        needs_filename = list(utils.query_api(folder, PEOPLE_IN_NEED_HDX_ADDRESS).values())[0]
+    else:
+        needs_filename = f'{PEOPLE_IN_NEED_FILENAME}.XLSX'
     df_main = df_main.append(get_number_of_people_in_need_per_country(countries, join(folder, needs_filename)))
     return df_main
 

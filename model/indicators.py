@@ -2,7 +2,7 @@ from os.path import join
 
 import pandas as pd
 
-import utils
+from model import utils
 
 WORLD_BANK_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 WORLD_BANK_DATASET_NAMES = [

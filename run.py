@@ -15,8 +15,7 @@ from hdx.location.country import Country
 from hdx.utilities.easy_logging import setup_logging
 from hdx.utilities.path import get_temp_dir
 
-sys.path.append('src')
-from main import get_indicators
+from model.main import get_indicators
 
 setup_logging()
 
@@ -32,17 +31,18 @@ def parse_args():
     parser.add_argument('-f', '--folder', default=None, help='Download folder')
     parser.add_argument('-k', '--keep', action='store_true', help='Keep folder')
     parser.add_argument('-gs', '--gsheet_auth', default=None, help='Credentials for accessing Google Sheets')
+    parser.add_argument('-e', '--excel', action='store_true', help='Output to Excel not Google Sheets')
     parser.add_argument('-d', '--debug', action='store_true', help='Run without querying API')
     args = parser.parse_args()
     return args
 
 
-def main(folder, keep, gsheet_auth, debug, **ignore):
+def main(folder, keep, gsheet_auth, excel, debug, **ignore):
     configuration = Configuration.read()
     countries = configuration['countries']
     palestine_country_code, _ = Country.get_iso3_country_code_fuzzy('Palestine')
     df_indicators, df_timeseries, df_cumulative = get_indicators(folder, countries, palestine_country_code, debug)
-    if gsheet_auth is None:
+    if excel or gsheet_auth is None:
         # Write to excel file
         writer = pd.ExcelWriter(OUTPUT_FILENAME, engine='xlsxwriter')
         df_indicators.to_excel(writer, sheet_name='Indicator', index=False)
@@ -93,4 +93,4 @@ if __name__ == '__main__':
         gsheet_auth = getenv('GSHEET_AUTH')
     facade(main, hdx_read_only=True, user_agent=user_agent, preprefix=preprefix, hdx_site=hdx_site,
            project_config_yaml=join('config', 'project_configuration.yml'), folder=folder, keep=args.keep,
-           gsheet_auth=gsheet_auth, debug=args.debug)
+           gsheet_auth=gsheet_auth, excel=args.excel, debug=args.debug)

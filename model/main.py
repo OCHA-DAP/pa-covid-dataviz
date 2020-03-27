@@ -1,4 +1,4 @@
-import timeseries, cumulative, indicators
+from model import timeseries, cumulative, indicators
 
 
 def get_indicators(folder, countries, palestine_country_code, debug):

@@ -7,7 +7,7 @@ from hdx.location.country import Country
 from hdx.utilities.compare import assert_files_same
 from hdx.utilities.path import temp_dir
 
-from main import get_indicators
+from model.main import get_indicators
 
 
 class TestCovid:

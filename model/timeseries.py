@@ -23,14 +23,17 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
         filename_pop = f'{POP_DATASET_NAME}.XLSX'
     # read them in
     case_data = pd.read_csv(join(folder, filename))
-    case_data['ADM0_NAME'] = case_data['ADM0_NAME'].str.lower().replace(
-        {'venezuela (bolivarian republic of)': 'Venezuela'})
+    case_data['ADM0_NAME'] = case_data['ADM0_NAME'].str.lower().replace({
+            'syrian arab republic': 'syria',
+            'venezuela (bolivarian republic of)': 'Venezuela',
+         })
     pop = pd.read_excel(join(folder, filename_pop), sheet_name='Data', header=3)
     pop['Country Name'] = pop['Country Name'].replace({
                                                        'Syrian Arab Republic': 'Syria',
                                                        'Venezuela, RB': 'Venezuela',
                                                        'Congo, Dem. Rep.': 'Democratic Republic of the Congo'
                                                        })
+    print(list(case_data['ADM0_NAME']))
     # process and merge timeseries data
     timeseries = pd.DataFrame()
     timeseries = timeseries.append(create_timeseries(countries, case_data, 'confirmed cases'))

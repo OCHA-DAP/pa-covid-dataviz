@@ -24,6 +24,7 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
     # read them in
     case_data = pd.read_csv(join(folder, filename))
     case_data['ADM0_NAME'] = case_data['ADM0_NAME'].replace({
+        'Syrian Arab Republic': 'Syria',
         'Venezuela (Bolivarian Republic of)': 'Venezuela',
         'occupied Palestinian territory': 'Occupied Palestinian Territory'
          })

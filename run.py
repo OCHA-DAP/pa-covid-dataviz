@@ -1,5 +1,6 @@
 import argparse
 import json
+import logging
 import sys
 from os import getenv
 from os.path import join
@@ -18,9 +19,11 @@ from hdx.utilities.path import get_temp_dir
 from model.main import get_indicators
 
 setup_logging()
+logger = logging.getLogger()
 
 
 OUTPUT_FILENAME = 'main.xlsx'
+VERSION = 1
 
 
 def parse_args():
@@ -38,6 +41,7 @@ def parse_args():
 
 
 def main(folder, keep, gsheet_auth, excel, debug, **ignore):
+    logger.info('##### pa-covid-dataviz version %d ####' % VERSION)
     configuration = Configuration.read()
     countries = configuration['countries']
     palestine_country_code, _ = Country.get_iso3_country_code_fuzzy('Palestine')

@@ -31,7 +31,9 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
     pop['Country Name'] = pop['Country Name'].replace({
                                                        'Syrian Arab Republic': 'Syria',
                                                        'Venezuela, RB': 'Venezuela',
-                                                       'Congo, Dem. Rep.': 'Democratic Republic of the Congo'
+                                                       'Congo, Dem. Rep.': 'Democratic Republic of the Congo',
+                                                       'Yemen, Rep.': 'Yemen',
+                                                       'West Bank and Gaza': 'occupied Palestinian territory'
                                                        })
     print(list(case_data['ADM0_NAME']))
     # process and merge timeseries data
@@ -42,7 +44,7 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
                                   right_on='Country Name', how='left')
     timeseries = timeseries.drop('Country Name', axis=1)
     timeseries['Country Code'].loc[timeseries['Country']
-                                   == 'Occupied Palestinian Territory'] = palestine_country_code
+                                   == 'occupied Palestinian territory'] = palestine_country_code
     timeseries['pop 100000'] = timeseries['latest population']/100000
     timeseries['confirmed cases per 100000'] = timeseries['confirmed cases']/timeseries['pop 100000']
     timeseries = get_ranks(timeseries)
@@ -58,7 +60,7 @@ def create_timeseries(countries, indicator_df, col_name):
     country_data['cum_conf'] = country_data['cum_conf'].astype(int)
     country_data.columns = ['Country', 'Date', col_name]
     country_data['Country'] = country_data['Country'].str.split().apply(
-        lambda x: [el.capitalize() if el not in ['of', 'the'] else el for el in x]).str.join(' ')
+        lambda x: [el.capitalize() if el not in ['of', 'the', 'occupied', 'territory'] else el for el in x]).str.join(' ')
 
     return country_data
 

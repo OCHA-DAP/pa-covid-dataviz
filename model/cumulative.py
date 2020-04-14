@@ -25,15 +25,16 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
     case_data = pd.read_csv(join(folder, filename))
     case_data['ADM0_NAME'] = case_data['ADM0_NAME'].replace({
         'Syrian Arab Republic': 'Syria',
-        'Venezuela (Bolivarian Republic of)': 'Venezuela',
-        'occupied Palestinian territory': 'Occupied Palestinian Territory'
+        'Venezuela (Bolivarian Republic of)': 'Venezuela'
          })
     pop = pd.read_excel(join(folder, filename_pop), sheet_name='Data', header=3)
     pop['Country Name'] = pop['Country Name'].replace({
                                                        'Syrian Arab Republic': 'Syria',
                                                        'Venezuela, RB': 'Venezuela',
-                                                       'Congo, Dem. Rep.': 'Democratic Republic of the Congo'
-                                                       })
+                                                       'Congo, Dem. Rep.': 'Democratic Republic of the Congo',
+                                                       'Yemen, Rep.': 'Yemen',
+                                                       'West Bank and Gaza': 'occupied Palestinian territory'
+    })
     # Get cumulative data
     cumulative = case_data.loc[case_data['ADM0_NAME'].isin(countries),
                                ['ADM0_NAME', 'cum_conf', 'cum_death', 'DateOfReport']]
@@ -44,7 +45,7 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
                                   right_on='Country Name', how='left')
     cumulative = cumulative.drop('Country Name', axis=1)
     cumulative['Country Code'].loc[cumulative['Country']
-                                   == 'Occupied Palestinian Territory'] = palestine_country_code
+                                   == 'occupied Palestinian territory'] = palestine_country_code
     # Get per 100000
     cumulative['pop 100000'] = cumulative['latest population']/100000
     cumulative['confirmed cases per 100000'] = cumulative['confirmed cases']/cumulative['pop 100000']

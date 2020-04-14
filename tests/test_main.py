@@ -28,15 +28,15 @@ class TestCovid:
         palestine_country_code, _ = Country.get_iso3_country_code_fuzzy('Palestine')
         df_indicators, df_timeseries, df_cumulative = get_indicators(folder, countries, palestine_country_code, True)
         with temp_dir('PA-COVID-TEST') as outdir:
-            filename = 'indicators.csv'
-            outputfile = join(outdir, filename)
-            df_indicators.to_csv(outputfile)
-            assert_files_same(join(folder, filename), outputfile)
-            filename = 'timeseries.csv'
-            outputfile = join(outdir, filename)
-            df_timeseries.to_csv(outputfile)
-            assert_files_same(join(folder, filename), outputfile)
-            filename = 'cumulative.csv'
-            outputfile = join(outdir, filename)
-            df_cumulative.to_csv(outputfile)
-            assert_files_same(join(folder, filename), outputfile)
+            ifilename = 'indicators.csv'
+            ioutputfile = join(outdir, ifilename)
+            df_indicators.to_csv(ioutputfile)
+            tfilename = 'timeseries.csv'
+            toutputfile = join(outdir, tfilename)
+            df_timeseries.to_csv(toutputfile)
+            cfilename = 'cumulative.csv'
+            coutputfile = join(outdir, cfilename)
+            df_cumulative.to_csv(coutputfile)
+            assert_files_same(join(folder, ifilename), ioutputfile)
+            assert_files_same(join(folder, tfilename), toutputfile)
+            assert_files_same(join(folder, cfilename), coutputfile)

@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 
 OUTPUT_FILENAME = 'main.xlsx'
-VERSION = 1
+VERSION = 1.1
 
 
 def parse_args():
@@ -41,7 +41,7 @@ def parse_args():
 
 
 def main(folder, keep, gsheet_auth, excel, debug, **ignore):
-    logger.info('##### pa-covid-dataviz version %d ####' % VERSION)
+    logger.info('##### pa-covid-dataviz version %.1f ####' % VERSION)
     configuration = Configuration.read()
     countries = configuration['countries']
     palestine_country_code, _ = Country.get_iso3_country_code_fuzzy('Palestine')

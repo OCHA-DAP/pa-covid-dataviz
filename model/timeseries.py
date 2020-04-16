@@ -56,8 +56,8 @@ def create_timeseries(countries, indicator_df, col_name):
     # subset data
     country_data = indicator_df.loc[indicator_df['ADM0_NAME'].str.lower()
                                     .isin(country_name.lower() for country_name in countries)]
-    country_data = country_data[['ADM0_NAME', 'DateOfDataEntry', 'cum_conf']]
-    country_data['cum_conf'] = country_data['cum_conf'].astype(int)
+    country_data = country_data[['ADM0_NAME', 'date_epicrv', 'CumCase']]
+    country_data['CumCase'] = country_data['CumCase'].astype(int)
     country_data.columns = ['Country', 'Date', col_name]
     country_data['Country'] = country_data['Country'].str.split().apply(
         lambda x: [el.capitalize() if el not in ['of', 'the', 'occupied', 'territory'] else el for el in x]).str.join(' ')

@@ -1,4 +1,4 @@
-OBJECTID,ADM0_NAME,DateOfDataEntry,cum_conf,NewCase,CENTER_LON,CENTER_LAT,ADM0_VIZ_NAME,GUID,Short_Name_ZH,Short_Name_FR,Short_Name_ES,Short_Name_RU,Short_Name_AR
+OBJECTID,ADM0_NAME,date_epicrv,CumCase,NewCase,CENTER_LON,CENTER_LAT,ADM0_VIZ_NAME,GUID,Short_Name_ZH,Short_Name_FR,Short_Name_ES,Short_Name_RU,Short_Name_AR
 1,AFGHANISTAN,2020-02-24T00:00:00.000Z,1,1,66.02652977,33.83890116,Afghanistan,bf4e1516-20f9-4d0b-afee-15fb1fbbbbbe,阿富汗,Afghanistan,Afganistán,Афганистан,أفغانستان
 2,AFGHANISTAN,2020-02-25T00:00:00.000Z,1,0,66.02652977,33.83890116,Afghanistan,bf4e1516-20f9-4d0b-afee-15fb1fbbbbbe,阿富汗,Afghanistan,Afganistán,Афганистан,أفغانستان
 3,AFGHANISTAN,2020-02-26T00:00:00.000Z,1,0,66.02652977,33.83890116,Afghanistan,bf4e1516-20f9-4d0b-afee-15fb1fbbbbbe,阿富汗,Afghanistan,Afganistán,Афганистан,أفغانستان

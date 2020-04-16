@@ -1,4 +1,4 @@
-ADM0_NAME,DateOfReport,cum_conf,cum_death,ID,CENTER_LON,CENTER_LAT,ADM0_VIZ_NAME,Short_Name_ZH,Short_Name_FR,Short_Name_ES,Short_Name_RU,Short_Name_AR
+ADM0_NAME,date_epicrv,CumCase,CumDeath,ID,CENTER_LON,CENTER_LAT,ADM0_VIZ_NAME,Short_Name_ZH,Short_Name_FR,Short_Name_ES,Short_Name_RU,Short_Name_AR
 China,2020-03-24T00:00:00.000Z,81869,3287,44056,103.8934731,36.51870146,China,中国,Chine,China,Китай,الصين
 Republic of Korea,2020-03-24T00:00:00.000Z,9137,126,44057,127.8293439,36.36770228,Republic of Korea,大韩民国,République de Corée,República de Corea,Республика Корея,جمهورية كوريا
 Australia,2020-03-24T00:00:00.000Z,2423,8,44058,134.490976,-25.73326023,Australia,澳大利亚,Australie,Australia,Австралия,أستراليا

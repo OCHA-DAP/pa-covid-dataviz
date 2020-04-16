@@ -1,4 +1,7 @@
+# prod
 spreadsheet_url: "https://docs.google.com/spreadsheets/d/1RNSC1FrYfprR2lY_XftGlSSLujYRizzYZd1zmelUPNY/edit"
+# test
+# spreadsheet_url: "https://docs.google.com/spreadsheets/d/1iBdFVrmianGnrPq_cfHt83xR1kVb_OBETwQlHUUr5E8/edit"
 indicator_sheetname: "Indicator"
 timeseries_sheetname: "Timeseries"
 cumulative_sheetname: "Cumulative"

@@ -4,8 +4,8 @@ import pandas as pd
 
 from model import utils
 
-CUMULATIVE_HDX_ADDRESS = 'coronavirus-covid-19-cases-data-for-china-and-the-rest-of-the-world'
-CUMULATIVE_DATASET_NAME = 'covid-19 cases by country.csv'
+CUMULATIVE_HDX_ADDRESS = 'coronavirus-covid-19-cases-and-deaths'
+CUMULATIVE_DATASET_NAME = 'WHO-COVID-19-global-data.csv'
 
 POP_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 POP_DATASET_NAME = 'Total Population'
@@ -22,7 +22,8 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
         filename = f'{CUMULATIVE_DATASET_NAME}.CSV'
         filename_pop = f'{POP_DATASET_NAME}.XLSX'
     # read them in
-    case_data = pd.read_csv(join(folder, filename))
+    df = pd.read_csv(join(folder, filename))
+    case_data = df[df.groupby('ADM0_NAME')['date_epicrv'].transform('max') == df['date_epicrv']]
     case_data['ADM0_NAME'] = case_data['ADM0_NAME'].replace({
         'Syrian Arab Republic': 'Syria',
         'Venezuela (Bolivarian Republic of)': 'Venezuela'

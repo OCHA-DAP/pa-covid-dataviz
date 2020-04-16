@@ -4,8 +4,8 @@ import pandas as pd
 
 from model import utils
 
-TIMESERIES_HDX_ADDRESS = 'coronavirus-covid-19-cases-data-for-china-and-the-rest-of-the-world'
-TIMESERIES_DATASET_NAME = 'covid-19 historical cases by country.csv'
+TIMESERIES_HDX_ADDRESS = 'coronavirus-covid-19-cases-and-deaths'
+TIMESERIES_DATASET_NAME = 'WHO-COVID-19-global-data.csv'
 
 POP_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 POP_DATASET_NAME = 'Total Population'

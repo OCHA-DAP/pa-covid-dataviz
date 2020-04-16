@@ -4,8 +4,8 @@ import pandas as pd
 
 from model import utils
 
-TIMESERIES_HDX_ADDRESS = 'coronavirus-covid-19-cases-data-for-china-and-the-rest-of-the-world'
-TIMESERIES_DATASET_NAME = 'covid-19 historical cases by country.csv'
+TIMESERIES_HDX_ADDRESS = 'coronavirus-covid-19-cases-and-deaths'
+TIMESERIES_DATASET_NAME = 'WHO-COVID-19-global-data.csv'
 
 POP_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 POP_DATASET_NAME = 'Total Population'
@@ -56,8 +56,8 @@ def create_timeseries(countries, indicator_df, col_name):
     # subset data
     country_data = indicator_df.loc[indicator_df['ADM0_NAME'].str.lower()
                                     .isin(country_name.lower() for country_name in countries)]
-    country_data = country_data[['ADM0_NAME', 'DateOfDataEntry', 'cum_conf']]
-    country_data['cum_conf'] = country_data['cum_conf'].astype(int)
+    country_data = country_data[['ADM0_NAME', 'date_epicrv', 'CumCase']]
+    country_data['CumCase'] = country_data['CumCase'].astype(int)
     country_data.columns = ['Country', 'Date', col_name]
     country_data['Country'] = country_data['Country'].str.split().apply(
         lambda x: [el.capitalize() if el not in ['of', 'the', 'occupied', 'territory'] else el for el in x]).str.join(' ')

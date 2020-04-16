@@ -4,8 +4,8 @@ import pandas as pd
 
 from model import utils
 
-CUMULATIVE_HDX_ADDRESS = 'coronavirus-covid-19-cases-data-for-china-and-the-rest-of-the-world'
-CUMULATIVE_DATASET_NAME = 'covid-19 cases by country.csv'
+CUMULATIVE_HDX_ADDRESS = 'coronavirus-covid-19-cases-and-deaths'
+CUMULATIVE_DATASET_NAME = 'WHO-COVID-19-global-data.csv'
 
 POP_HDX_ADDRESS = 'world-bank-indicators-of-interest-to-the-covid-19-outbreak'
 POP_DATASET_NAME = 'Total Population'
@@ -22,7 +22,8 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
         filename = f'{CUMULATIVE_DATASET_NAME}.CSV'
         filename_pop = f'{POP_DATASET_NAME}.XLSX'
     # read them in
-    case_data = pd.read_csv(join(folder, filename))
+    df = pd.read_csv(join(folder, filename))
+    case_data = df[df.groupby('ADM0_NAME')['date_epicrv'].transform('max') == df['date_epicrv']]
     case_data['ADM0_NAME'] = case_data['ADM0_NAME'].replace({
         'Syrian Arab Republic': 'Syria',
         'Venezuela (Bolivarian Republic of)': 'Venezuela'
@@ -37,7 +38,7 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
     })
     # Get cumulative data
     cumulative = case_data.loc[case_data['ADM0_NAME'].isin(countries),
-                               ['ADM0_NAME', 'cum_conf', 'cum_death', 'DateOfReport']]
+                               ['ADM0_NAME', 'CumCase', 'CumDeath', 'date_epicrv']]
     cumulative.columns = ['Country', 'confirmed cases', 'deaths', 'last_updated']
     # Combine with pop
     pop_data = utils.get_pop_data(countries, pop)
@@ -51,11 +52,11 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
     cumulative['confirmed cases per 100000'] = cumulative['confirmed cases']/cumulative['pop 100000']
     cumulative['deaths per 100000'] = cumulative['deaths']/cumulative['pop 100000']
     # Get global cases
-    global_cases_and_deaths = case_data[['cum_conf', 'cum_death']].sum()
+    global_cases_and_deaths = case_data[['CumCase', 'CumDeath']].sum()
     n_countries = len(case_data['ADM0_NAME'].unique())
     cumulative = cumulative.append({'Country': 'Global',
-                                    'confirmed cases': global_cases_and_deaths['cum_conf'],
-                                    'deaths': global_cases_and_deaths['cum_death']}, ignore_index=True)
+                                    'confirmed cases': global_cases_and_deaths['CumCase'],
+                                    'deaths': global_cases_and_deaths['CumDeath']}, ignore_index=True)
     cumulative['n_countries'] = 1
     cumulative.loc[cumulative['Country'] == 'Global', 'n_countries'] = n_countries
     return cumulative

@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 
 OUTPUT_FILENAME = 'main.xlsx'
-VERSION = 1.2
+VERSION = 1.3
 
 
 def parse_args():

@@ -1,4 +1,4 @@
-OBJECTID,ISO_2_CODE,ISO_3_CODE,ADM0_NAME,date_epicrv,NewCase,CumCase,NewDeath,CumDeath,Short_Name_ZH,Short_Name_FR,Short_Name_ES,Short_Name_RU,Short_Name_AR
+OBJECTID,ISO_2_CODE,ISO_3_CODE, Country,Date_reported, New_cases, Cumulative_cases, New_deaths, Cumulative_deaths,Short_Name_ZH,Short_Name_FR,Short_Name_ES,Short_Name_RU,Short_Name_AR
 1,AF,AFG,Afghanistan,2020-02-24T00:00:00.000Z,1,1,0,0,阿富汗,Afghanistan,Afganistán,Афганистан,أفغانستان
 2,AF,AFG,Afghanistan,2020-02-25T00:00:00.000Z,0,1,0,0,阿富汗,Afghanistan,Afganistán,Афганистан,أفغانستان
 3,AF,AFG,Afghanistan,2020-02-26T00:00:00.000Z,0,1,0,0,阿富汗,Afghanistan,Afganistán,Афганистан,أفغانستان

@@ -23,7 +23,9 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
         filename_pop = f'{POP_DATASET_NAME}.XLSX'
     # read them in
     case_data = pd.read_csv(join(folder, filename))
-    case_data['ADM0_NAME'] = case_data['ADM0_NAME'].str.lower().replace({
+    case_data.columns = case_data.columns.str.strip()
+    case_data['Country'] = case_data['Country'].str.lower().replace({
+            'occupied Palestinian territory, including east Jerusalem': 'occupied Palestinian territory',
             'syrian arab republic': 'syria',
             'venezuela (bolivarian republic of)': 'Venezuela',
          })
@@ -35,7 +37,7 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
                                                        'Yemen, Rep.': 'Yemen',
                                                        'West Bank and Gaza': 'occupied Palestinian territory'
                                                        })
-    print(list(case_data['ADM0_NAME']))
+    print(list(case_data['Country']))
     # process and merge timeseries data
     timeseries = pd.DataFrame()
     timeseries = timeseries.append(create_timeseries(countries, case_data, 'confirmed cases'))
@@ -54,10 +56,10 @@ def create_dataframe(folder, countries, palestine_country_code, debug=False):
 
 def create_timeseries(countries, indicator_df, col_name):
     # subset data
-    country_data = indicator_df.loc[indicator_df['ADM0_NAME'].str.lower()
+    country_data = indicator_df.loc[indicator_df['Country'].str.lower()
                                     .isin(country_name.lower() for country_name in countries)]
-    country_data = country_data[['ADM0_NAME', 'date_epicrv', 'CumCase']]
-    country_data['CumCase'] = country_data['CumCase'].astype(int)
+    country_data = country_data[['Country', 'Date_reported', 'Cumulative_cases']]
+    country_data['Cumulative_cases'] = country_data['Cumulative_cases'].astype(int)
     country_data.columns = ['Country', 'Date', col_name]
     country_data['Country'] = country_data['Country'].str.split().apply(
         lambda x: [el.capitalize() if el not in ['of', 'the', 'occupied', 'territory'] else el for el in x]).str.join(' ')
